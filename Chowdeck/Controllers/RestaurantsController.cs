@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Chowdeck.Models;
 using System.Drawing.Printing;
-using System.Data.Entity;
+//using System.Data.Entity;
 using Microsoft.AspNetCore.Http.HttpResults;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -61,16 +61,24 @@ namespace Chowdeck.Controllers
         [HttpGet("{restaurantId}/menus")]
         public IActionResult RestaurantMenus(string restaurantId)
         {
-            Restaurant? restaurant = _context.Restaurants
-                .FirstOrDefault(r => r.Id == restaurantId);
+            var restaurant = _context.Restaurants
+                .FirstOrDefault(r => r.Id ==  restaurantId);
 
             if(restaurant == null) return NotFound();
 
             var response = new
             {
+                restaurant,
                 menus = _context.RestaurantMenus.Where(m => m.RestaurantId == restaurantId)
-                .Select(m => new { m.Id, m.Name, m.Category, 
-                    m.CreatedAt, m.Image, Price = (decimal) m.Price })
+                .Select(m => new
+                {
+                    m.Id,
+                    m.Name,
+                    m.Category,
+                    m.CreatedAt,
+                    m.Image,
+                    Price = (decimal)m.Price
+                })
                 .ToList()
             };
 
