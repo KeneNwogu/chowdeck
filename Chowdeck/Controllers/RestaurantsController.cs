@@ -30,7 +30,12 @@ namespace Chowdeck.Controllers
             //IQueryCollection query
             )
         {
+            string category = HttpContext.Request.Query["category"].ToString() ?? "";
+            string search = HttpContext.Request.Query["search"].ToString() ?? "";
+
             int pageSize = 40;
+
+            if (category.Length > 0) pageSize = 10;
 
             int page = 1;  // Default to page 1
 
@@ -43,7 +48,21 @@ namespace Chowdeck.Controllers
             var totalCount = _context.Restaurants.Count();
             var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            List<Restaurant> restaurants = _context.Restaurants
+            var query = _context.Restaurants.AsQueryable();
+
+            if (category.Length > 0)
+            {
+                query = query.Where(r => EF.Functions.Like(r.Category.ToLower(), $"%{category.ToLower()}%"));
+            }
+
+            if(search.Length > 0)
+            {
+                query = query.Where(r =>
+                    EF.Functions.Like(r.Category.ToLower(), $"%{search.ToLower()}%") ||
+                    EF.Functions.Like(r.Name.ToLower(), $"%{search.ToLower()}%"));
+            }
+
+            List<Restaurant> restaurants = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize).ToList();
 
