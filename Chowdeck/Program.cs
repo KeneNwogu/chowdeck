@@ -66,6 +66,8 @@ app.UseSwaggerUI();
 //    app.UseSwaggerUI();
 //}
 
+app.UseCors("AllowOrigins");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
