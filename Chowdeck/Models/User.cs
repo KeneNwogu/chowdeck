@@ -5,10 +5,10 @@ namespace Chowdeck.Models
 {
     public static class UserRole
     {
-        public const string ADMIN = "admin";
-        public const string USER = "user";
-        public const string TEST_USER = "test_user";
-        public const string RIDER = "rider";
+        public const string ADMIN = "ADMIN";
+        public const string USER = "USER";
+        public const string TEST_USER = "TEST_USER";
+        public const string RIDER = "RIDER";
 
         public static bool IsValidRole(string role)
         {
@@ -32,6 +32,7 @@ namespace Chowdeck.Models
         [ValidateUserRole]
         public string Role { get; set; }
 
+        public string? ProfileImage { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property)]

@@ -71,16 +71,31 @@ namespace Chowdeck.Controllers
         }
 
 
-        [HttpGet("protected")]
-        [Authorize]
-        public ActionResult<IEnumerable<string>> Get()
+        [HttpPost("test-login")]
+        public IActionResult GetTestUsers(TestLoginDto testLogin)
         {
-            return new string[] { "value1", "value2", "value3", "value4", "value5" };
+            User? user = _context.Users.FirstOrDefault(u => u.Id == testLogin.TestUserId && u.Role == "TEST_USER");
+
+            if (user == null) return BadRequest(new { message = "Invalid test user." });
+
+            return Ok(new { user, token = GenerateJSONWebToken(user) });
+        }
+
+
+        [HttpGet("test-users")]
+        public IActionResult TestUserLogin()
+        {
+            List<User> testUsers = _context.Users.Where(u => u.Role == "TEST_USER").ToList();
+
+            return Ok(new { testUsers });
         }
 
         private string GenerateJSONWebToken(User userInfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY") ?? 
+                throw new ArgumentNullException("No JWT_KEY was provided."))
+                );
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],

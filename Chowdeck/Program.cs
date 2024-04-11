@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Text;
 using dotenv.net;
 using NuGet.Protocol;
+using Microsoft.Extensions.Hosting;
 
 DotEnv.Load();
 
@@ -55,6 +56,13 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ChowdeckContext>();
+    context.Database.Migrate(); // Applies pending migrations
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

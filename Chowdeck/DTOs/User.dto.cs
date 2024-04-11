@@ -33,6 +33,11 @@ namespace Chowdeck.DTOs
         public string Password { get; set; }
     }
 
+    public class TestLoginDto
+    {
+        public string TestUserId { get; set; }
+    }
+
     public class UserTokenDto
     {
         public string UserId { get; set; }
