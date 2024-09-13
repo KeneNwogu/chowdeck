@@ -138,6 +138,21 @@ namespace Chowdeck.Controllers
             } });
         }
 
+        [HttpGet("")]
+        [Authorize]
+        public IActionResult GetOrders()
+        {
+            string filter = HttpContext.Request.Query["status"].ToString() ?? "in_progress";
+            string userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
+            List<Order> orders = _context.Orders
+                .Include(o => o.Timeline)
+                .Include(o => o.OrderItems)
+                .Where(o => o.UserId == userId && o.Status == filter)
+                .ToList();
+
+            return Ok(new { orders });
+        }
+
         [HttpGet("{orderId}")]
         [Authorize]
         public IActionResult GetOrderDetails(string orderId)
@@ -229,7 +244,6 @@ namespace Chowdeck.Controllers
 
             order.PaymentStatus = "completed";
 
-            _context.Orders.Add(order);
             _context.SaveChanges();
 
             Task.Run(async () => PaymentOrderSuccessCommandHandler.HandlePendingOrder(reference));

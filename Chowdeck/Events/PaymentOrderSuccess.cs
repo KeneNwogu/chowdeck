@@ -54,6 +54,7 @@ namespace Chowdeck.Events
 
                     if (order == null) { return; }
 
+
                     await Task.Delay(3000);
 
                     List<string> timelineMessages = new List<string>
@@ -68,6 +69,11 @@ namespace Chowdeck.Events
 
                     for(int i = 1; i < 7; i++)
                     {
+                        if(_context.OrderTimelines.FirstOrDefault(t => t.OrderId == orderId && t.Stage == (OrderTimelineStageEnum) i) != null)
+                        {
+                            continue;
+                        }
+
                         OrderTimeline orderTimeline = new OrderTimeline
                         {
                             Stage = (OrderTimelineStageEnum) i,
@@ -85,6 +91,9 @@ namespace Chowdeck.Events
 
                         await Task.Delay(1000 * 6 * i);
                     }
+
+                    order.Status = "completed";
+                    _context.SaveChanges();
                 }
 
             }
