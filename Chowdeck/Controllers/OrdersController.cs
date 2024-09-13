@@ -145,6 +145,7 @@ namespace Chowdeck.Controllers
             string filter = HttpContext.Request.Query["status"].ToString() ?? "in_progress";
             string userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             List<Order> orders = _context.Orders
+                .Include(o => o.Restaurant)
                 .Include(o => o.Timeline)
                 .Include(o => o.OrderItems)
                 .Where(o => o.UserId == userId && o.Status == filter)
@@ -159,6 +160,7 @@ namespace Chowdeck.Controllers
         {
             string userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             Order? order = _context.Orders
+                .Include(o => o.Restaurant)
                 .Include(o => o.Timeline)
                 .Include(o => o.OrderItems)
                 .ThenInclude(item => item.Menu)

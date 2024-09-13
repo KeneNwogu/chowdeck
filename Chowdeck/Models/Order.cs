@@ -40,7 +40,8 @@ namespace Chowdeck.Models
 
         public string? RiderId { get; set; } = null;
 
-
+        
+        public virtual Restaurant? Restaurant { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public virtual ICollection<OrderTimeline> Timeline { get; set; } = new List<OrderTimeline>();
     }
