@@ -50,7 +50,7 @@ namespace Chowdeck.Controllers
 
         [HttpPost("")]
         [Authorize]
-        public IActionResult CreateOrder(CreateOrderDto orderDto)
+        public async Task<IActionResult> CreateOrder(CreateOrderDto orderDto)
         {
             // validate order
             // check if restaurant exists
@@ -100,9 +100,42 @@ namespace Chowdeck.Controllers
             _context.Orders.Add(order);
             _context.SaveChanges();
 
+            string email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)!.Value;
+            // TODO: make payment transaction here
+            var httpClient = _httpClient.CreateClient();
+
+            var requestData = JsonSerializer.Serialize(new
+            {
+                email,
+                amount = (int)Math.Ceiling((order.TotalAmount + order.ServiceCharge) * 100),
+                reference = order.Id
+            });
+
+            Console.WriteLine(requestData);
+
+            var requestContent = new StringContent(requestData, Encoding.UTF8, "application/json");
+
+            var httpRequestMessage = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"https://api.paystack.co/transaction/initialize")
+            {
+                Headers = { { HeaderNames.Authorization, $"Bearer {Environment.GetEnvironmentVariable("PAYSTACK_SECRET_KEY")}" } },
+                Content = requestContent
+            };
+
+            var response = await httpClient.SendAsync(httpRequestMessage);
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var paystackTransaction = JsonSerializer.Deserialize<JsonNode>(content);
+
+            Console.WriteLine(paystackTransaction);
+
             return Ok(new { order = new { 
                 order.Id, order.Status, order.TotalAmount, 
-                order.ServiceCharge } });
+                order.ServiceCharge,
+                paymentLink = paystackTransaction!["data"]!["authorization_url"]
+            } });
         }
 
         [HttpGet("{orderId}")]
@@ -191,6 +224,13 @@ namespace Chowdeck.Controllers
             if ((string) verificationData["data"]!["status"] != "success") return BadRequest();
 
             //_mediator.Send(new OrderPaymentSuccessCommand { orderId = reference });
+            Order? order = _context.Orders.FirstOrDefault(o => o.Id == reference);
+            if (order == null) return NotFound(new { message = "No order was found" });
+
+            order.PaymentStatus = "completed";
+
+            _context.Orders.Add(order);
+            _context.SaveChanges();
 
             Task.Run(async () => PaymentOrderSuccessCommandHandler.HandlePendingOrder(reference));
 

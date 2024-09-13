@@ -98,8 +98,9 @@ namespace Chowdeck.Controllers
                 );
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
+            var token = new JwtSecurityToken(
+              Environment.GetEnvironmentVariable("JWT_ISSUER"),
+              Environment.GetEnvironmentVariable("JWT_ISSUER"),
               new List<Claim> { 
                   new Claim(ClaimTypes.NameIdentifier, userInfo.Id),
                   new Claim(ClaimTypes.Email, userInfo.Email),
