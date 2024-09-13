@@ -39,11 +39,17 @@ namespace Chowdeck.Models
         public string PaymentStatus { get; set; }
 
         public string? RiderId { get; set; } = null;
-
+    
+        public DateTime? CreatedAt { get; set; }
         
         public virtual Restaurant? Restaurant { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public virtual ICollection<OrderTimeline> Timeline { get; set; } = new List<OrderTimeline>();
+
+        public Order()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 
     public class OrderItem
@@ -94,5 +100,12 @@ namespace Chowdeck.Models
 
         //[ForeignKey("OrderId")]
         //public virtual Order Order { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+
+        public OrderTimeline()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 }

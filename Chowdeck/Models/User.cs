@@ -33,6 +33,13 @@ namespace Chowdeck.Models
         public string Role { get; set; }
 
         public string? ProfileImage { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+
+        public User()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Property)]
