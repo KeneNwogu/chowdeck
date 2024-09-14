@@ -66,6 +66,7 @@ public partial class ChowdeckContext : DbContext
                 .HasColumnName("name");
             entity.Property(e => e.Rank).HasColumnName("rank");
             entity.Property(e => e.Ratings).HasColumnName("ratings");
+            entity.Ignore(m => m.RestaurantMenus);
         });
 
         modelBuilder.Entity<RestaurantMenu>(entity =>
@@ -94,6 +95,9 @@ public partial class ChowdeckContext : DbContext
             entity.HasOne(d => d.Restaurant).WithMany(p => p.RestaurantMenus)
                 .HasForeignKey(d => d.RestaurantId)
                 .HasConstraintName("restaurant_menus_restaurant_id_fkey");
+
+            entity.Ignore(m => m.Restaurant);
+
         });
 
         modelBuilder.Entity<User>(entity =>

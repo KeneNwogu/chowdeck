@@ -163,7 +163,9 @@ namespace Chowdeck.Controllers
                 .Include(o => o.Restaurant)
                 .Include(o => o.Timeline)
                 .Include(o => o.OrderItems)
+                .ThenInclude(i => i.Menu)
                 .FirstOrDefault(o => o.Id == orderId && o.UserId == userId);
+
             if (order == null) return NotFound(new { message = "No order was found" });
 
             //List<OrderItem> orderItems = _context.OrderItems.Where(i => i.OrderId == orderId).ToList();
