@@ -163,7 +163,6 @@ namespace Chowdeck.Controllers
                 .Include(o => o.Restaurant)
                 .Include(o => o.Timeline)
                 .Include(o => o.OrderItems)
-                .ThenInclude(item => item.Menu)
                 .FirstOrDefault(o => o.Id == orderId && o.UserId == userId);
             if (order == null) return NotFound(new { message = "No order was found" });
 
@@ -253,7 +252,7 @@ namespace Chowdeck.Controllers
             return Ok();
         }
 
-        [HttpGet("{orderId}/timelines")]
+        [HttpGet("timelines")]
         public async Task StreamOrderTimelines(string orderId, CancellationToken ct)
         {
             Console.WriteLine("connecting to sse. Start of code at least");
@@ -268,13 +267,7 @@ namespace Chowdeck.Controllers
             {
                 OrderTimeline? messageData = null;
 
-                _hub.Subscribe<OrderTimeline>(async data =>
-                {
-                    if(data.OrderId == orderId)
-                    {
-                        messageData = data;
-                    }
-                });
+                _hub.Subscribe<OrderTimeline>(async data => messageData = data);
 
                 while (!ct.IsCancellationRequested)
                 {
