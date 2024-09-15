@@ -89,7 +89,7 @@ namespace Chowdeck.Events
                         _context.SaveChanges();
                         _hub.Publish(orderTimeline);
 
-                        await Task.Delay(1000 * 6 * i);
+                        await Task.Delay(2000 * i);
                     }
 
                     order.Status = "completed";

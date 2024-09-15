@@ -271,8 +271,8 @@ namespace Chowdeck.Controllers
 
                 _hub.Subscribe<OrderTimeline>(async data => messageData = data);
 
-                // Create a timer for 2 minutes (120,000 milliseconds)
-                var connectionTimeout = TimeSpan.FromMinutes(2);
+                // Create a timer for 1 minute
+                var connectionTimeout = TimeSpan.FromMinutes(1);
                 var startTime = DateTime.UtcNow;
 
                 while (!ct.IsCancellationRequested && DateTime.UtcNow - startTime < connectionTimeout)
