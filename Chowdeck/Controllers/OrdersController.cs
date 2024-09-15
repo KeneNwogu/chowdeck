@@ -293,7 +293,7 @@ namespace Chowdeck.Controllers
                         messageData = null;
                     }
 
-                    await Task.Delay(100);
+                    // await Task.Delay(100);
                 }
 
                 _hub.Unsubscribe();
