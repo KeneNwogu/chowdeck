@@ -255,7 +255,7 @@ namespace Chowdeck.Controllers
         }
 
         [HttpGet("timelines")]
-        public async Task StreamOrderTimelines(string orderId, CancellationToken ct)
+        public async Task StreamOrderTimelines(CancellationToken ct)
         {
             Console.WriteLine("connecting to sse. Start of code at least");
 
