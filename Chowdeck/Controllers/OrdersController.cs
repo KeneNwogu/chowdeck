@@ -271,7 +271,11 @@ namespace Chowdeck.Controllers
 
                 _hub.Subscribe<OrderTimeline>(async data => messageData = data);
 
-                while (!ct.IsCancellationRequested)
+                // Create a timer for 2 minutes (120,000 milliseconds)
+                var connectionTimeout = TimeSpan.FromMinutes(2);
+                var startTime = DateTime.UtcNow;
+
+                while (!ct.IsCancellationRequested && DateTime.UtcNow - startTime < connectionTimeout)
                 {
                     if (messageData != null)
                     {
@@ -288,10 +292,13 @@ namespace Chowdeck.Controllers
 
                         messageData = null;
                     }
+
+                    await Task.Delay(100);
                 }
 
                 _hub.Unsubscribe();
-
+                response.Body.Close();
+                return;
             }
             catch (Exception ex)
             {
